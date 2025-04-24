@@ -68,6 +68,7 @@ RUN if [ -d "/src" ]; then \
         cp /usr/lib/gcc/x86_64-w64-mingw32/9.3-posix/libstdc++-6.dll /src/ && \
         cp /usr/lib/gcc/x86_64-w64-mingw32/9.3-posix/libgcc_s_seh-1.dll /src/ && \
         cp /usr/x86_64-w64-mingw32/lib/libwinpthread-1.dll /src/ \
+        # openh264-1.8.0-win64.dll this comes from cisco https://github.com/cisco/openh264/releases/tag/v1.8.0 \
     else \
         echo "Error: /src does not exist. Exiting."; \
         exit 1; \
