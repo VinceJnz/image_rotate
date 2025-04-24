@@ -1,8 +1,15 @@
 #include <opencv2/opencv.hpp>
 #include <iostream>
+#include <fstream>
 #include <string>
 
 int main(int argc, char** argv) {
+    // Print OpenCV build information
+    // std::cout << cv::getBuildInformation() << std::endl;
+    //cv::utils::logging::setLogLevel(cv::utils::logging::LOG_LEVEL_VERBOSE);
+    // cv::VideoCapture video(inputPath, cv::CAP_FFMPEG);
+    // std::cout << "Backend used: " << video.getBackendName() << std::endl;
+
     // Check for command-line arguments
     if (argc != 4) {
         std::cerr << "Usage: " << argv[0] << " <input_video> <output_video> <angle (90, 180, 270)>" << std::endl;
@@ -12,6 +19,17 @@ int main(int argc, char** argv) {
     std::string inputPath = argv[1];
     std::string outputPath = argv[2];
     int angle = std::stoi(argv[3]);
+
+    std::cout << "Input Path: " << inputPath << std::endl;
+    std::cout << "Output Path: " << outputPath << std::endl;
+    std::cout << "Angle: " << angle << std::endl;
+
+    std::ifstream file(inputPath);
+    if (!file.good()) {
+        std::cerr << "Error: File does not exist or cannot be accessed: " << inputPath << std::endl;
+        return -1;
+    }
+    file.close();
 
     // Validate rotation angle
     if (angle != 90 && angle != 180 && angle != 270) {

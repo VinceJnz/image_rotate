@@ -53,16 +53,22 @@ COPY . /app
 
 # Compile the C++ code to a Windows binary
 RUN cd /app && \
+    chmod +x cp2src && \
     x86_64-w64-mingw32-g++ -o rotate_video.exe rotate_video.cpp -std=c++11 -I/usr/local/include/opencv4 -L/usr/local/lib -lopencv_core4120 -lopencv_videoio4120 -lopencv_highgui4120 -lopencv_imgproc4120 -lopencv_imgcodecs4120
 
 # copy the exe and dlls to the src folder
-RUN cp /app/rotate_video.exe /src/ && \
-    cp /usr/local/bin/libopencv_core4120.dll /src/ && \
-    cp /usr/local/bin/libopencv_videoio4120.dll /src/ && \
-    cp /usr/local/bin/libopencv_highgui4120.dll /src/ && \
-    cp /usr/local/bin/libopencv_imgproc4120.dll /src/ && \
-    cp /usr/local/bin/libopencv_imgcodecs4120.dll /src/ && \
-    cp /usr/lib/gcc/x86_64-w64-mingw32/9.3-posix/libstdc++-6.dll /src/ && \
-    cp /usr/lib/gcc/x86_64-w64-mingw32/9.3-posix/libgcc_s_seh-1.dll /src/ && \
-    cp /usr/x86_64-w64-mingw32/lib/libwinpthread-1.dll /src/ && \
-    cp /app/rotate_video.mp4 /src/ 
+RUN if [ -d "/src" ]; then \
+        echo "/src exists. Proceeding with file copy..."; \
+        cp /app/rotate_video.exe /src/ && \
+        cp /usr/local/bin/libopencv_core4120.dll /src/ && \
+        cp /usr/local/bin/libopencv_videoio4120.dll /src/ && \
+        cp /usr/local/bin/libopencv_highgui4120.dll /src/ && \
+        cp /usr/local/bin/libopencv_imgproc4120.dll /src/ && \
+        cp /usr/local/bin/libopencv_imgcodecs4120.dll /src/ && \
+        cp /usr/lib/gcc/x86_64-w64-mingw32/9.3-posix/libstdc++-6.dll /src/ && \
+        cp /usr/lib/gcc/x86_64-w64-mingw32/9.3-posix/libgcc_s_seh-1.dll /src/ && \
+        cp /usr/x86_64-w64-mingw32/lib/libwinpthread-1.dll /src/ \
+    else \
+        echo "Error: /src does not exist. Exiting."; \
+        exit 1; \
+    fi
