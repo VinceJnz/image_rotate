@@ -1,0 +1,45 @@
+# Use an Ubuntu base image
+FROM ubuntu:20.04
+
+# Set environment variables
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Install required tools and dependencies
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    cmake \
+    git \
+    mingw-w64 \
+    pkg-config \
+    wget \
+    unzip \
+    && apt-get clean
+
+# Install OpenCV
+RUN mkdir /opencv && cd /opencv && \
+    git clone https://github.com/opencv/opencv.git && \
+    git clone https://github.com/opencv/opencv_contrib.git && \
+    mkdir /opencv/opencv/build && cd /opencv/opencv/build && \
+    cmake -DCMAKE_BUILD_TYPE=Release \
+          -DCMAKE_INSTALL_PREFIX=/usr/local \
+          -DCMAKE_TOOLCHAIN_FILE=/opencv/opencv/platforms/win32/mingw-w64-x86_64.cmake \
+          -DWITH_IPP=OFF \
+          -DWITH_OPENEXR=OFF \
+          -DWITH_TIFF=OFF \
+          -DBUILD_TESTS=OFF \
+          -DBUILD_PERF_TESTS=OFF \
+          -DOPENCV_EXTRA_MODULES_PATH=/opencv/opencv_contrib/modules \
+          .. && \
+    make -j$(nproc) && make install
+
+# Set working directory
+WORKDIR /app
+
+# Copy your source code into the container
+COPY . /app
+
+# Compile the C++ code to a Windows binary
+RUN x86_64-w64-mingw32-g++ -o rotate_video.exe rotate_video.cpp -std=c++11 \
+    -I/usr/local/include/opencv4 \
+    -L/usr/local/lib \
+    -lopencv_core -lopencv_videoio -lopencv_highgui -lopencv_imgproc -lopencv_imgcodecs

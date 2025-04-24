@@ -1,0 +1,30 @@
+# Use an Ubuntu base image
+FROM ubuntu:20.04
+
+# Set environment variables
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Install required tools and dependencies
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    cmake \
+    git \
+    mingw-w64 \
+    wget \
+    unzip \
+    && apt-get clean
+
+# Copy prebuilt OpenCV binaries into the container
+COPY opencv /opencv
+
+# Set working directory
+WORKDIR /app
+
+# Copy your source code into the container
+COPY . /app
+
+# Compile the C++ code to a Windows binary
+RUN x86_64-w64-mingw32-g++ -o rotate_video.exe rotate_video.cpp -std=c++11 \
+    -I/opencv/include \
+    -L/opencv/x64/mingw/lib \
+    -lopencv_core -lopencv_videoio -lopencv_highgui -lopencv_imgproc -lopencv_imgcodecs
